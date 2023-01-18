@@ -11,6 +11,23 @@ pipeline {
       steps {
         echo("Build Stage") 
         sh "echo 'we are testing jenkins commands'"
+        sshPublisher(
+            continueOnError: false, failOnError: true,
+            publishers: [
+                sshPublisherDesc(
+                configName: "esraa server",
+                verbose: true,
+                transfers: [
+                sshTransfer(
+                        execCommand:"cd /var/www/ && rm -rf test_deploy"
+                    ),
+                    sshTransfer(
+                        sourceFiles: "**/*",
+                        remoteDirectory: "test_deploy",
+                        execCommand:"cd /var/www/test_deploy && sudo npm i"
+                )
+             ])
+            ])
       }
     }
     stage('Test') {
@@ -21,6 +38,18 @@ pipeline {
     stage('Deploy') {
       steps {
         echo("Deploy")
+        sshPublisher(
+            continueOnError: false, failOnError: true,
+            publishers: [
+                sshPublisherDesc(
+                configName: "dev server",
+                verbose: true,
+                transfers: [
+               sshTransfer(
+                        execCommand: "cd /var/www/test_deploy && pm2 start"
+                         )
+                ])
+            ])
       }
     }
     stage('docker build') {
