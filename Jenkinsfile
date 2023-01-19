@@ -42,7 +42,7 @@ pipeline {
             continueOnError: false, failOnError: true,
             publishers: [
                 sshPublisherDesc(
-                configName: "dev server",
+                configName: "esraa_server",
                 verbose: true,
                 transfers: [
                sshTransfer(
